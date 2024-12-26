@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareEase: Senior Task Scheduler</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.2.31/dist/vue.global.prod.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div id="app" class="min-h-screen">
+        <nav class="bg-blue-600 text-white p-4">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold">CareEase</h1>
+                <button @click="toggleTheme" class="p-2 rounded-full hover:bg-blue-700">
+                    <i :class="isDarkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
+                </button>
+            </div>
+        </nav>
+
+        <div class="container mx-auto p-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h2 class="text-xl font-bold mb-4">Today's Schedule</h2>
+                    <div class="space-y-2">
+                        <div v-for="task in todayTasks" :key="task.id" 
+                             :class="'p-3 rounded-lg ' + task.colorClass">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-semibold">{{ task.title }}</h3>
+                                    <p class="text-sm">{{ task.time }}</p>
+                                </div>
+                                <button @click="completeTask(task.id)" 
+                                        class="bg-green-500 text-white px-3 py-1 rounded">
+                                    Complete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow p-4">
+                    <h2 class="text-xl font-bold mb-4">Medication Tracker</h2>
+                    <div class="space-y-2">
+                        <div v-for="med in medications" :key="med.id" 
+                             class="p-3 bg-green-100 rounded-lg">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h3 class="font-semibold">{{ med.name }}</h3>
+                                    <p class="text-sm">{{ med.dosage }} - {{ med.time }}</p>
+                                </div>
+                                <button @click="takeMedication(med.id)"
+                                        :class="'px-3 py-1 rounded ' + (med.taken ? 'bg-gray-500' : 'bg-green-500 text-white')">
+                                    {{ med.taken ? 'Taken' : 'Take' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 bg-white rounded-lg shadow p-4">
+                <h2 class="text-xl font-bold mb-4">Upcoming Appointments</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div v-for="apt in appointments" :key="apt.id" 
+                         class="p-3 bg-blue-100 rounded-lg">
+                        <h3 class="font-semibold">{{ apt.doctor }}</h3>
+                        <p class="text-sm">{{ apt.date }} at {{ apt.time }}</p>
+                        <p class="text-sm text-gray-600">{{ apt.location }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        createApp({
+            data() {
+                return {
+                    isDarkMode: false,
+                    todayTasks: [
+                        { id: 1, title: 'Morning Walk', time: '8:00 AM', colorClass: 'bg-yellow-100' },
+                        { id: 2, title: 'Blood Pressure Check', time: '9:00 AM', colorClass: 'bg-red-100' },
+                        { id: 3, title: 'Lunch', time: '12:00 PM', colorClass: 'bg-green-100' }
+                    ],
+                    medications: [
+                        { id: 1, name: 'Aspirin', dosage: '81mg', time: 'Morning', taken: false },
+                        { id: 2, name: 'Vitamin D', dosage: '1000IU', time: 'Morning', taken: false },
+                        { id: 3, name: 'Blood Pressure Med', dosage: '10mg', time: 'Evening', taken: false }
+                    ],
+                    appointments: [
+                        { id: 1, doctor: 'Dr. Smith', date: '2024-01-15', time: '2:30 PM', location: 'Main St Clinic' },
+                        { id: 2, doctor: 'Dr. Johnson', date: '2024-01-20', time: '10:00 AM', location: 'Heart Center' },
+                        { id: 3, doctor: 'Dr. Williams', date: '2024-01-25', time: '3:00 PM', location: 'Family Practice' }
+                    ]
+                }
+            },
+            methods: {
+                toggleTheme() {
+                    this.isDarkMode = !this.isDarkMode;
+                    document.body.classList.toggle('bg-gray-900');
+                },
+                completeTask(id) {
+                    const task = this.todayTasks.find(t => t.id === id);
+                    if (task) {
+                        task.completed = true;
+                    }
+                },
+                takeMedication(id) {
+                    const med = this.medications.find(m => m.id === id);
+                    if (med) {
+                        med.taken = true;
+                    }
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
